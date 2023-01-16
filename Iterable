@@ -1,0 +1,32 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.17;
+
+contract Iterable {
+    mapping(uint256 => uint256) royalties;
+    mapping(uint256 => bool) inserted;
+
+    function set(uint256 tokenId, uint256 royaltyFraction) external payable {
+        royalties[tokenId] = royaltyFraction;
+
+        if (!inserted[tokenId]) {
+            inserted[tokenId] = true;
+        }
+    }
+
+    function get(uint256 tokenId) external view returns (uint256) {
+        uint256 royaltyFraction;
+
+        if (inserted[tokenId]) {
+            return (royalties[tokenId]);
+        } else {
+            uint256 count = tokenId - 1;
+            while (!inserted[count]) {
+                count--;
+                royaltyFraction = royalties[count];
+                if (inserted[count]) break;
+            }
+        }
+
+        return royaltyFraction;
+    }
+}
